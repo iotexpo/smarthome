@@ -3,7 +3,7 @@
 #include <PubSubClient.h>
 
 #define PIN 21
-#define LED_COUNT 1
+#define LED_COUNT 10
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883
@@ -17,7 +17,7 @@ const char* password = "Rishi1234";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-Adafruit_NeoPixel leds = Adafruit_NeoPixel(LED_COUNT, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel leds = Adafruit_NeoPixel(LED_COUNT, PIN, NEO_RGB + NEO_KHZ400);
 
 void setup()
 {
@@ -52,16 +52,26 @@ void callback(char* topic, byte* payload, unsigned int length) {
     char receivedChar = (char)payload[i];
     Serial.print(receivedChar);
     if (receivedChar == '0') {
-      leds.setPixelColor(0, 0x2e, 0x40, 0x53);
-      leds.show();
+      colorWipe(leds.Color(0, 0, 0), 40);
     }
     if (receivedChar == '1') {
-      leds.clear();
-      leds.show();
+     colorWipe(leds.Color(153, 27, 226), 40);
+    }
+    if (receivedChar == 'red') {
+     colorWipe(leds.Color(255,0,0), 40);
     }
 
   }
   Serial.println();
+}
+
+// Set color for LEDs in array with delay between setting each LED
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<leds.numPixels(); i++) {
+    leds.setPixelColor(i, c);
+    leds.show();
+    delay(wait);
+  }
 }
 
 void reconnect() {
